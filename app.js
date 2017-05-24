@@ -7,7 +7,6 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 
 var index = require('./routes/index');
-var users = require('./routes/users');
 
 var app = express();
 app.use(express.static('./public'));
