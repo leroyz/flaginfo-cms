@@ -52,34 +52,33 @@ module.exports = {
           }));
       });
   },
-    updateUser:function(req,res,next){
-        const user = req.query.user;
-        if(tool.isEmpty(user)){
-            res.end(JSON.stringify({
-                resultCode : '-1',
-                message:'param error'
-            }));
-            return;
-        }
-        var sql = 'update user set name=?,mobile=?,tel=?,email=?' +
-            'update_date=?';
-        var update_date = new Date();
+  updateUser:function(req,res,next){
+    const user = req.query.user;
+    if(tool.isEmpty(user)){
+        res.end(JSON.stringify({
+            resultCode : '-1',
+            message:'param error'
+        }));
+        return;
+    }
+    var sql = 'update user set name=?,mobile=?,tel=?,email=?,update_date=?';
+    var update_date = new Date();
 
-        var params = [user.name,user.mobile,user.tel,user.email,update_date];
-        connect.query(sql,params,function(err,result){
-            if(err){
-                res.end(JSON.stringify({
-                    resultCode : '-1',
-                    message:'update failed'
-                }));
-                return;
-            }
-            res.end(JSON.stringify({
-                resultCode : '200',
-                message:'update success'
-            }));
-        });
-    },
+    var params = [user.name,user.mobile,user.tel,user.email,update_date];
+    connect.query(sql,params,function(err,result){
+      if(err){
+        res.end(JSON.stringify({
+            resultCode : '-1',
+            message:'update failed'
+        }));
+        return;
+      }
+      res.end(JSON.stringify({
+          resultCode : '200',
+          message:'update success'
+      }));
+    });
+  },
   deleteUser:function(req,res,next){
     const id = req.query.id;
     if(tool.isEmpty(id)){
