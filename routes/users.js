@@ -34,10 +34,10 @@ module.exports = {
           }));
           return;
       }
-      var sql = 'insert into user value(?,?,?,?,?,?,?,?,?)';
+      var sql = 'insert into user value(?,?,?,?,?,?,?,?,?,?)';
       var create_date = new Date();
 
-      var params = [tool.uuid(),user.name,user.mobile,user.tel,user.email,create_date,'','',user.role];
+      var params = [tool.uuid(),'000000',user.name,user.mobile,user.tel,user.email,create_date,'','',user.role];
       connect.query(sql,params,function(err,result){
           if(err){
               res.end(JSON.stringify({
@@ -103,6 +103,32 @@ module.exports = {
       }));
     });
   },
-  login:function(req,res,next){},
-  logout:function(req,res,next){}
+  login:function(req,res,next){
+      var username = req.params.name,
+          password = req.params.password;
+      var sql = 'select * from user where name='+username+' and password='+password;
+      connect.query(sql,function(err,result){
+          if(result.length == 0){
+              res.end(JSON.stringify({
+                  resultCode : '-1',
+                  message:'user not exist'
+              }));
+          }else{
+              console.log('============='+user.name+'已经登录===============');
+              req.session.user = user;
+              res.end(JSON.stringify({
+                  resultCode:'200',
+                  message:'login success'
+              }));
+          }
+      })
+  },
+  logout:function(req,res,next){
+      req.session.destroy(function(){
+          res.end(JSON.stringify({
+              resultCode:'200',
+              message:'user logout'
+          }));
+      })
+  }
 }
