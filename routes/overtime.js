@@ -5,6 +5,12 @@ var connect =  require('../db/db.js');
 var tool = require('../tool/tool.js');
 
 module.exports = {
+    /**
+     * 申请加班
+     * @param req
+     * @param res
+     * @param next
+     */
     addOverTimeBill:function(req,res,next){
         var user = req.session.user;
         var values = [tool.uuid(),req.params.begin_date,req.params.end_date,req.params.reason,
