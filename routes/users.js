@@ -1,3 +1,4 @@
+'user strict';
 var express = require('express');
 var connect =  require('../db/db.js');
 var tool = require('../tool/tool.js');
@@ -108,6 +109,7 @@ module.exports = {
           password = req.params.password;
       var sql = 'select * from user where name='+username+' and password='+password;
       connect.query(sql,function(err,result){
+          var user = result[0];
           if(result.length == 0){
               res.end(JSON.stringify({
                   resultCode : '-1',

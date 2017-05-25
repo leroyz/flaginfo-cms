@@ -24,5 +24,13 @@ module.exports = {
         }else{
             return false;
         }
+    },
+    /**
+     * 获取时间段
+     * @param dateString
+     */
+    timeSlot:function(beginDate,endDate){
+        var timeStamp = new Date(beginDate) - new Date(endDate);
+        return (timeStamp/1000/60).toFixed(1);
     }
 }

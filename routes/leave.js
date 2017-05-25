@@ -7,5 +7,11 @@ var tool = require('../tool/tool.js');
 module.exports = {
     addLeaveBill:function(){
 
+    },
+    getMyLeaveList:function(){
+
+    },
+    getMyLeaveStatistic:function(){
+
     }
 }
