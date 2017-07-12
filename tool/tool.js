@@ -19,7 +19,7 @@ module.exports = {
         });*/
     },
     isEmpty:function(obj){
-        if(obj === null || obj === undefined || obj === ''){
+        if(obj === null || obj === undefined || obj === '' || obj == {}){
             return true;
         }else{
             return false;
