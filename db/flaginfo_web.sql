@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50624
 File Encoding         : 65001
 
-Date: 2017-07-12 10:29:39
+Date: 2017-07-12 16:27:16
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -149,19 +149,22 @@ CREATE TABLE `project` (
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` varchar(255) NOT NULL,
+  `number` varchar(255) NOT NULL,
   `name` varchar(30) NOT NULL COMMENT '名字',
   `password` varchar(16) NOT NULL,
   `mobile` varchar(11) NOT NULL COMMENT '移动电话',
   `tel` varchar(8) DEFAULT NULL COMMENT '座机',
   `email` varchar(30) NOT NULL COMMENT '邮箱',
+  `join_data` datetime NOT NULL,
   `create_date` datetime NOT NULL COMMENT '创建时间',
   `update_date` datetime DEFAULT NULL COMMENT '更新时间',
   `delete_date` datetime DEFAULT NULL COMMENT '删除时间',
-  `role` int(10) NOT NULL DEFAULT '0',
+  `role` int(1) NOT NULL COMMENT '角色，0表示超管，1表示普通管理员，2表示普通员工',
+  `gender` int(1) NOT NULL COMMENT '性别，0表示男，1表示女',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES ('1', '啥打法上', '000000', '18783838383', '02823659', '123@qq.com', '2017-05-24 11:24:24', '2017-05-24 11:24:27', null, '0');
+INSERT INTO `user` VALUES ('1', '001', 'leroy', '000000', '18783838383', '02823659', '123@qq.com', '2017-07-12 14:51:16', '2017-05-24 11:24:24', '2017-05-24 11:24:27', null, '0', '0');
