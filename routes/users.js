@@ -4,6 +4,21 @@ var connect =  require('../db/db.js');
 var tool = require('../tool/tool.js');
 
 module.exports = {
+    getUserList:function(req,res,next){
+        let user = req.query.user;
+        let sql = '';
+        console.log(sql);
+        connect.query(sql, function (error, results, fields) {
+            if (error) {
+                res.end(JSON.stringify({
+                    resultCode : '-1',
+                    message:'query failed'
+                }));
+                return;
+            };
+            res.end(JSON.stringify(results));
+        });
+    },
   getUserInfo:function(req,res,next){
     let id = req.query.id;
     if(tool.isEmpty(id)){
