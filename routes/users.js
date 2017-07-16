@@ -6,7 +6,7 @@ var tool = require('../tool/tool.js');
 module.exports = {
     getUserList:function(req,res,next){
         let user = req.query.user;
-        let sql = '';
+        let sql = 'select * from user';
         console.log(sql);
         connect.query(sql, function (error, results, fields) {
             if (error) {
