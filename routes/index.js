@@ -8,6 +8,7 @@ var Leave = require('./leave.js');
 var Overtime = require('./overtime.js');
 
 /*用户相关操作*/
+router.post('/api/user/count', User.getCountUser);
 router.post('/api/user/query', User.getUserList);
 router.post('/api/user/getInfo', User.getUserInfo);
 router.post('/api/user/add', User.addUser);

@@ -4,10 +4,25 @@ var connect =  require('../db/db.js');
 var tool = require('../tool/tool.js');
 
 module.exports = {
-    getUserList:function(req,res,next){
-        let user = req.query.user;
-        let sql = 'select * from user';
-        console.log(sql);
+    //计算user数量
+    getCountUser:function(req,res,next){
+        let name = req.body.name || '',
+            number = req.body.number || '',
+            startDate = req.body.startDate || '',
+            endDate = req.body.endDate || '';
+        let sql = 'select count(id) as count from user where 1=1';
+        if(!tool.isEmpty(name)){
+            sql += ' and name like "%'+ name+'%"';
+        }
+        if(!tool.isEmpty(number)){
+            sql += ' and number='+ number;
+        }
+        if(!tool.isEmpty(startDate)){
+            sql += ' and join_date > '+ startDate;
+        }
+        if(!tool.isEmpty(endDate)){
+            sql += ' and join_date < '+ endDate;
+        }
         connect.query(sql, function (error, results, fields) {
             if (error) {
                 res.end(JSON.stringify({
@@ -16,6 +31,41 @@ module.exports = {
                 }));
                 return;
             };
+            res.end(JSON.stringify(results[0]));
+        });
+    },
+    getUserList:function(req,res,next){
+        let name = req.body.name || '',
+            number = req.body.number || '',
+            startDate = req.body.startDate || '',
+            endDate = req.body.endDate || '',
+            pageNo = req.body.pageNo || 1,
+            pageSize = req.body.pageSize || 10;
+        let sql = 'select * from user where 1=1';
+        if(!tool.isEmpty(name)){
+            sql += ' and name like "%'+ name+'%"';
+        }
+        if(!tool.isEmpty(number)){
+            sql += ' and number='+ number;
+        }
+        if(!tool.isEmpty(startDate)){
+            sql += ' and join_date > '+ startDate;
+        }
+        if(!tool.isEmpty(endDate)){
+            sql += ' and join_date < '+ endDate;
+        }
+        sql += ' order by number asc limit '+(pageNo-1)*pageSize+','+pageNo*pageSize;
+        console.log(sql);
+        connect.query(sql, function (error, results, fields) {
+            console.log(error);
+            if (error) {
+                res.end(JSON.stringify({
+                    resultCode : '-1',
+                    message:'query failed'
+                }));
+                return;
+            };
+            console.log(results);
             res.end(JSON.stringify(results));
         });
     },
@@ -43,17 +93,11 @@ module.exports = {
     });
   },
   addUser:function(req,res,next){
-      let user = req.query;
-      if(tool.isEmpty(user)){
-          res.end(JSON.stringify({
-              resultCode : '-1',
-              message:'param error'
-          }));
-          return;
-      }
-      let sql = 'insert into user value(?,?,?,?,?,?,?,?,?,?)';
+      let user = req.body;
+      let sql = 'insert into user value(?,?,?,?,?,?,?,?,?,?,?,?,?)';
       console.log(sql);
-      let params = [tool.uuid(),user.name,'111111',user.mobile,user.tel,user.email,new Date(),'','',user.role];
+      let params = [tool.uuid(),user.number,user.name,'flaginfo111',user.mobile,user.tel,user.email,new Date(),null,null,user.role,user.gender,user.date];
+      console.log(params);
       connect.query(sql,params,function(err,result){
           if(err){
               console.log(err)
@@ -96,7 +140,7 @@ module.exports = {
     });
   },
   deleteUser:function(req,res,next){
-    let id = req.query.id;
+    let id = req.body.id;
     if(tool.isEmpty(id)){
       res.end(JSON.stringify({
         resultCode : '-1',
@@ -121,10 +165,11 @@ module.exports = {
     });
   },
   login:function(req,res,next){
-      let username = req.query.name,
-          password = req.query.password
+      console.log(req.body);
+      let username = req.body.username,
+          password = req.body.password;
       let sql = "select * from user where name='"+username+ "' and password='"+password+"'";
-      console.log(sql);
+      console.log('==================login:'+sql+'=====================');
       connect.query(sql,function(err,result){
           console.log(result);
           let user = result[0];
@@ -138,7 +183,7 @@ module.exports = {
               req.session.user = user;
               res.end(JSON.stringify({
                   resultCode:'200',
-                  message:'login success'
+                  body:user
               }));
           }
       })
