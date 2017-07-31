@@ -96,7 +96,7 @@ module.exports = {
       let user = req.body;
       let sql = 'insert into user value(?,?,?,?,?,?,?,?,?,?,?,?,?)';
       console.log(sql);
-      let params = [tool.uuid(),user.number,user.name,'flaginfo111',user.mobile,user.tel,user.email,new Date(),null,null,user.role,user.gender,user.date];
+      let params = [tool.uuid(),user.number,user.name,'flaginfo111',user.mobile,user.tel,user.email,user.date,new Date(),null,null,user.role,user.gender];
       console.log(params);
       connect.query(sql,params,function(err,result){
           if(err){
