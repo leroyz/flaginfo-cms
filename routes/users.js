@@ -10,7 +10,7 @@ module.exports = {
             number = req.body.number || '',
             startDate = req.body.startDate || '',
             endDate = req.body.endDate || '';
-        let sql = 'select count(id) as count from user where 1=1';
+        let sql = 'select count(id) as count from user where role != "0"';
         if(!tool.isEmpty(name)){
             sql += ' and name like "%'+ name+'%"';
         }
@@ -41,7 +41,7 @@ module.exports = {
             endDate = req.body.endDate || '',
             pageNo = req.body.pageNo || 1,
             pageSize = req.body.pageSize || 10;
-        let sql = 'select * from user where 1=1';
+        let sql = 'select * from user where role != "0"';
         if(!tool.isEmpty(name)){
             sql += ' and name like "%'+ name+'%"';
         }
@@ -94,9 +94,9 @@ module.exports = {
   },
   addUser:function(req,res,next){
       let user = req.body;
-      let sql = 'insert into user value(?,?,?,?,?,?,?,?,?,?,?,?,?)';
+      let sql = 'insert into user value(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
       console.log(sql);
-      let params = [tool.uuid(),user.number,user.name,'flaginfo111',user.mobile,user.tel,user.email,user.date,new Date(),null,null,user.role,user.gender];
+      let params = [tool.uuid(),user.number,user.name,'flaginfo111',user.mobile,user.tel,user.email,user.date,new Date(),null,null,user.role,user.gender,user.position,user.desc];
       console.log(params);
       connect.query(sql,params,function(err,result){
           if(err){
