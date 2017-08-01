@@ -16,9 +16,11 @@ module.exports = {
             params = req.body;
         let sql = 'insert into overtime_bill values(?,?,?,?,?,?)';
         let values = [tool.uuid(),params.begin_date,params.end_date,params.reason,
-                    req.params.reason,tool.timeSlot(params.begin_date,params.end_date),user.user_id];
+                    Math.floor((new Date(params.end_date) - new Date(params.begin_date))/1000/60/60),user.id];
+        console.log(values);
         connect.query(sql,values,function(err,result){
             if(err){
+                console.log(err);
                 res.end(JSON.stringify({
                     resultCode:'-1',
                     message:'add failed'
@@ -59,21 +61,11 @@ module.exports = {
      * @param req
      * @param res
      * @param next
-     * 统计方式包含两种{
-     *  1、按时间段统计，即包含开始时间和结束时间
-     *  2、按月份统计，即按照指定的月份统计
-     * }
-     * 统计结果包含{
-     *  开始时间
-     *  结束时间
-     *  加班总时长
-     *
-     * }
      */
     getOverTimeStatistic:function(req,res,next){
-        let option = req.query
+        let option = req.body;
         console.log(option);
-        let sql = 'select user.name,sum(overtime_bill.time) as time from user LEFT JOIN overtime_bill on user.id = overtime_bill.user_id where 1=1';
+        let sql = 'select user.number,user.name,sum(overtime_bill.time) as time from user LEFT JOIN overtime_bill on user.id = overtime_bill.user_id where 1=1';
         if(!tool.isEmpty(option.name)){
             sql += ' and user.name like "%'+option.name+'%"';
         }
