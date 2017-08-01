@@ -71,7 +71,8 @@ module.exports = {
      * }
      */
     getOverTimeStatistic:function(req,res,next){
-        let option = req.query;
+        let option = req.query
+        console.log(option);
         let sql = 'select user.name,sum(overtime_bill.time) as time from user LEFT JOIN overtime_bill on user.id = overtime_bill.user_id where 1=1';
         if(!tool.isEmpty(option.name)){
             sql += ' and user.name like "%'+option.name+'%"';
@@ -80,10 +81,10 @@ module.exports = {
             sql += ' and user.number ='+option.number;
         }
         if(!tool.isEmpty(option.begin_date)){
-            sql += ' and overtime_bill.begin_date > '+option.begin_date;
+            sql += ' and overtime_bill.begin_date > "'+option.begin_date+'"';
         }
         if(!tool.isEmpty(option.end_date)){
-            sql += ' and overtime_bill.end_date > '+option.end_date;
+            sql += ' and overtime_bill.end_date < "'+option.end_date+'"';
         }
         sql += ' group by user.name';
         console.log('==============='+sql);
