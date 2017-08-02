@@ -94,6 +94,16 @@ module.exports = {
   },
   addUser:function(req,res,next){
       let user = req.body;
+      connect.query('select id from user where number="'+user.number+'"',function(err,result){
+          if(result){
+              res.end(JSON.stringify({
+                  resultCode : '-1',
+                  message:'该工号已经存在'
+              }));
+              return;
+          }
+
+      });
       let sql = 'insert into user value(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
       console.log(sql);
       let params = [tool.uuid(),user.number,user.name,'flaginfo111',user.mobile,user.tel,user.email,user.date,new Date(),null,null,user.role,user.gender,user.position,user.desc];
@@ -105,26 +115,19 @@ module.exports = {
                   resultCode : '-1',
                   message:'add failed'
               }));
-              return;
+          }else{
+              res.end(JSON.stringify({
+                  resultCode : '200',
+                  body:{}
+              }));
           }
-          res.end(JSON.stringify({
-              resultCode : '200',
-              message:'add success'
-          }));
+
       });
   },
   updateUser:function(req,res,next){
     let user = req.query.user;
-    if(tool.isEmpty(user)){
-        res.end(JSON.stringify({
-            resultCode : '-1',
-            message:'param error'
-        }));
-        return;
-    }
-    let sql = 'update user set name=?,mobile=?,tel=?,email=?,update_date=?';
-    let update_date = new Date();
-    let params = [user.name,user.mobile,user.tel,user.email,update_date];
+    let sql = 'update user set name=?,mobile=?,tel=?,email=?,update_date=now,position=?,desc=? where id="'+user.id+'"';
+    let params = [user.name,user.mobile,user.tel,user.email,user.position,user.desc];
     connect.query(sql,params,function(err,result){
       if(err){
         res.end(JSON.stringify({
@@ -135,7 +138,7 @@ module.exports = {
       }
       res.end(JSON.stringify({
           resultCode : '200',
-          message:'update success'
+          body:{}
       }));
     });
   },
@@ -150,7 +153,7 @@ module.exports = {
     }
     let sql = "delete from user where id='"+id+"'";
     console.log(sql);
-      connect.query(sql,function(err,result){
+    connect.query(sql,function(err,result){
       if(err){
         res.end(JSON.stringify({
           resultCode : '-1',
@@ -158,10 +161,30 @@ module.exports = {
         }));
         return;
       }
-      res.end(JSON.stringify({
-        resultCode : '200',
-        message:'delete success'
-      }));
+    });
+    let leave_sql = 'delete from leave_bill where user_id="'+id+'"';
+    connect.query(leave_sql,function(err,result){
+        if(err){
+            res.end(JSON.stringify({
+                resultCode : '-1',
+                message:'delete failed'
+            }));
+            return;
+        }
+    });
+    let overtime_sql = 'delete from overtime_bill where user_id="'+id+'"';
+    connect.query(overtime_sql,function(err,result){
+        if(err){
+            res.end(JSON.stringify({
+                resultCode : '-1',
+                message:'delete failed'
+            }));
+            return;
+        }
+        res.end(JSON.stringify({
+            resultCode : '200',
+            message:'delete success'
+        }));
     });
   },
   login:function(req,res,next){
@@ -195,5 +218,23 @@ module.exports = {
               message:'user logout'
           }));
       })
+  },
+  changePassword:function(req,res,next){
+      let user = req.query.user;
+      let sql = 'update user set password="'+req.body.password+'"';
+      connect.query(sql,function(err,result){
+          if(err){
+              res.end(JSON.stringify({
+                  resultCode : '-1',
+                  message:'update failed'
+              }));
+          }else{
+              res.end(JSON.stringify({
+                  resultCode : '200',
+                  body:{}
+              }));
+          }
+
+      });
   }
 }

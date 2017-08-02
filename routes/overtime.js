@@ -61,6 +61,9 @@ module.exports = {
      * @param req
      * @param res
      * @param next
+     * req{
+     *  name,number,begin_date,end_date
+     * }
      */
     getOverTimeStatistic:function(req,res,next){
         let option = req.body;
