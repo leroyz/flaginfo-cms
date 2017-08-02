@@ -10,25 +10,32 @@ Target Server Type    : MYSQL
 Target Server Version : 50624
 File Encoding         : 65001
 
-Date: 2017-07-31 15:19:58
+Date: 2017-08-02 17:00:05
 */
 
 SET FOREIGN_KEY_CHECKS=0;
 
 -- ----------------------------
--- Table structure for books
+-- Table structure for book
 -- ----------------------------
-DROP TABLE IF EXISTS `books`;
-CREATE TABLE `books` (
+DROP TABLE IF EXISTS `book`;
+CREATE TABLE `book` (
   `id` varchar(255) NOT NULL,
   `name` varchar(100) NOT NULL,
   `number` varchar(10) NOT NULL,
   `from` varchar(100) DEFAULT NULL COMMENT '来自何处',
+  `create_date` date NOT NULL,
+  `status` int(1) unsigned zerofill NOT NULL DEFAULT '0' COMMENT '状态，0表示未借出，1表示已借出',
+  `user_id` varchar(255) DEFAULT NULL COMMENT '借书人id',
+  `begin_date` date DEFAULT NULL COMMENT '开始时间',
+  `end_date` date DEFAULT NULL COMMENT '结束时间',
+  `return_date` date DEFAULT NULL COMMENT '归还时间',
+  UNIQUE ('number'),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of books
+-- Records of book
 -- ----------------------------
 
 -- ----------------------------
@@ -52,10 +59,10 @@ CREATE TABLE `book_bill` (
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for holiday
+-- Table structure for leave
 -- ----------------------------
-DROP TABLE IF EXISTS `holiday`;
-CREATE TABLE `holiday` (
+DROP TABLE IF EXISTS `leave`;
+CREATE TABLE `leave` (
   `id` varchar(255) NOT NULL,
   `user_id` varchar(255) NOT NULL COMMENT '外键，关联userid',
   `leave_time` float NOT NULL DEFAULT '0' COMMENT '总共请假时间',
@@ -63,32 +70,32 @@ CREATE TABLE `holiday` (
   `surplus_time` float NOT NULL DEFAULT '0' COMMENT '剩余调休时间',
   `month_time` float NOT NULL DEFAULT '0' COMMENT '本月请假时间',
   PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+  KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of holiday
+-- Records of leave
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for holiday_bill
+-- Table structure for leave_bill
 -- ----------------------------
-DROP TABLE IF EXISTS `holiday_bill`;
-CREATE TABLE `holiday_bill` (
+DROP TABLE IF EXISTS `leave_bill`;
+CREATE TABLE `leave_bill` (
   `id` varchar(255) NOT NULL,
   `user_id` varchar(255) NOT NULL COMMENT '外键，关联userid',
   `begin_date` datetime NOT NULL COMMENT '开始时间',
   `end_date` datetime DEFAULT NULL COMMENT '结束时间',
   `content` varchar(255) NOT NULL DEFAULT '0' COMMENT '请假原因',
   `time` float NOT NULL DEFAULT '0' COMMENT '请假时长',
+  `type` int(1) NOT NULL COMMENT '请假类型',
   PRIMARY KEY (`id`),
   KEY `user_id_fk` (`user_id`),
   CONSTRAINT `user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of holiday_bill
+-- Records of leave_bill
 -- ----------------------------
 
 -- ----------------------------
@@ -101,8 +108,7 @@ CREATE TABLE `overtime` (
   `total_time` float DEFAULT '0' COMMENT '总共加班时间',
   `month_time` float DEFAULT '0' COMMENT '本月加班时间',
   PRIMARY KEY (`id`,`user_id`),
-  KEY `user_id_fk_overtime` (`user_id`),
-  CONSTRAINT `user_id_fk_overtime` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+  KEY `user_id_fk_overtime` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -121,8 +127,7 @@ CREATE TABLE `overtime_bill` (
   `time` float NOT NULL DEFAULT '0' COMMENT '请假时长',
   `user_id` varchar(255) NOT NULL COMMENT '外键，关联userid',
   PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `ovbill_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+  KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -161,10 +166,13 @@ CREATE TABLE `user` (
   `delete_date` date DEFAULT NULL COMMENT '删除时间',
   `role` int(1) NOT NULL COMMENT '角色，0表示超管，1表示普通管理员，2表示普通员工',
   `gender` int(1) NOT NULL COMMENT '性别，0表示男，1表示女',
+  `position` varchar(50) DEFAULT NULL COMMENT '职位',
+  `desc` varchar(500) DEFAULT NULL COMMENT '备注，描述',
+  UNIQUE ('number'),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES ('1', '001', 'leroy', '000000', '18783838383', '02823659', '123@qq.com', '2017-07-12', '2017-05-24', '2017-05-24', null, '0', '0');
+INSERT INTO `user` VALUES ('0', '000', 'admin', 'admin123', '18282828282', '02823659', 'admin@flaginfo.com.cn', '2017-07-12', '2017-08-02', null, null, '0', '0', '超级管理员', '超级管理员拥有所有操作权限');
