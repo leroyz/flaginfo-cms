@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50624
 File Encoding         : 65001
 
-Date: 2017-08-02 17:00:05
+Date: 2017-08-03 09:30:15
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -23,7 +23,6 @@ CREATE TABLE `book` (
   `id` varchar(255) NOT NULL,
   `name` varchar(100) NOT NULL,
   `number` varchar(10) NOT NULL,
-  `from` varchar(100) DEFAULT NULL COMMENT '来自何处',
   `create_date` date NOT NULL,
   `status` int(1) unsigned zerofill NOT NULL DEFAULT '0' COMMENT '状态，0表示未借出，1表示已借出',
   `user_id` varchar(255) DEFAULT NULL COMMENT '借书人id',

@@ -39,7 +39,7 @@ module.exports = {
                 return;
             }
         });
-        let sql = 'inset into book values(?,?,,?,?)';
+        let sql = 'inset into book values(?,?,?,?)';
         var params = [tool.uuid(),book.name,book.number,new Date()];
         connect.query(sql,params,function(err,result){
             if(err){
