@@ -12,11 +12,11 @@ module.exports = {
      * @param next
      */
     addOverTimeBill:function(req,res,next){
-        let user = req.session.user,
-            params = req.body;
+        let params = req.body;
+        console.log(params);
         let sql = 'insert into overtime_bill values(?,?,?,?,?,?)';
-        let values = [tool.uuid(),params.begin_date,params.end_date,params.reason,
-                    Math.floor((new Date(params.end_date) - new Date(params.begin_date))/1000/60/60),user.id];
+        let values = [tool.uuid(),params.beginTime,params.endTime,params.reason,
+                    Math.floor((new Date(params.endTime) - new Date(params.beginTime))/1000/60/60),params.userId];
         console.log(values);
         connect.query(sql,values,function(err,result){
             if(err){
@@ -40,21 +40,45 @@ module.exports = {
      * @param next
      */
     getMyOverTimeList:function(req,res,next){
-        var user = req.session.user;
-        var sql = 'select * from overtime_bill where user_id = "'+user.user_id+'"';
+        var params = req.body;
+        var resultData = {};
+        var sql = 'select * from overtime_bill where user_id = "'+params.userId+'"';
+        if(!tool.isEmpty(params.beginTime)){
+            sql += ' and begin_date > "'+params.beginTime+'"';
+        }
+        if(!tool.isEmpty(params.endTime)){
+            sql += ' and end_date < "'+ params.endTime+'"';
+        }
+        //var sql = 'select * from overtime_bill where user_id = "'+params.userId+'" limit '+(params.pageNo-1)*params.pageSize+','+params.pageNo*params.pageSize;
+        console.log(sql);
         connect.query(sql,function(err,result){
             if(err){
+                console.log(err);
                 res.end(JSON.stringify({
                     resultCode:'-1',
                     message:'query failed'
                 }));
             }else{
-                res.end(JSON.stringify({
-                    resultCode:'200',
-                    body:result
-                }));
+                resultData['total'] = result.length;
+                sql += ' limit '+(params.pageNo-1)*params.pageSize+','+params.pageNo*params.pageSize;
+    //            var count = 'select id from overtime_bill where user_id = "'+params.userId+'"';
+                connect.query(sql,function(err,result){
+                    if(err){
+                        res.end(JSON.stringify({
+                            resultCode:'-1',
+                            message:'query failed'
+                        }));
+                    }else{
+                        resultData['list'] = result;
+                        res.end(JSON.stringify({
+                            resultCode:'200',
+                            body:resultData
+                    }));
+                    }
+                });
             }
         });
+
     },
     /**
      * 加班统计
@@ -68,18 +92,18 @@ module.exports = {
     getOverTimeStatistic:function(req,res,next){
         let option = req.body;
         console.log(option);
-        let sql = 'select user.number,user.name,sum(overtime_bill.time) as time from user LEFT JOIN overtime_bill on user.id = overtime_bill.user_id where 1=1';
-        if(!tool.isEmpty(option.name)){
-            sql += ' and user.name like "%'+option.name+'%"';
+        let sql = 'select user.number,user.name,sum(overtime_bill.time) as time from user LEFT JOIN overtime_bill on user.id = overtime_bill.user_id where user.role != 0';
+        if(!tool.isEmpty(option.username)){
+            sql += ' and user.name like "%'+option.username+'%"';
         }
         if(!tool.isEmpty(option.number)){
             sql += ' and user.number ='+option.number;
         }
-        if(!tool.isEmpty(option.begin_date)){
-            sql += ' and overtime_bill.begin_date > "'+option.begin_date+'"';
+        if(!tool.isEmpty(option.beginTime)){
+            sql += ' and overtime_bill.begin_date > "'+option.beginTime+'"';
         }
-        if(!tool.isEmpty(option.end_date)){
-            sql += ' and overtime_bill.end_date < "'+option.end_date+'"';
+        if(!tool.isEmpty(option.endTime)){
+            sql += ' and overtime_bill.end_date < "'+option.endTime+'"';
         }
         sql += ' group by user.name';
         console.log('==============='+sql);

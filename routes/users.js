@@ -95,34 +95,36 @@ module.exports = {
   addUser:function(req,res,next){
       let user = req.body;
       connect.query('select id from user where number="'+user.number+'"',function(err,result){
-          if(result){
+          console.log(result);
+          if(result.length > 0){
               res.end(JSON.stringify({
                   resultCode : '-1',
                   message:'该工号已经存在'
               }));
               return;
-          }
-
-      });
-      let sql = 'insert into user value(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
-      console.log(sql);
-      let params = [tool.uuid(),user.number,user.name,'flaginfo111',user.mobile,user.tel,user.email,user.date,new Date(),null,null,user.role,user.gender,user.position,user.desc];
-      console.log(params);
-      connect.query(sql,params,function(err,result){
-          if(err){
-              console.log(err)
-              res.end(JSON.stringify({
-                  resultCode : '-1',
-                  message:'add failed'
-              }));
           }else{
-              res.end(JSON.stringify({
-                  resultCode : '200',
-                  body:{}
-              }));
-          }
+              let sql = 'insert into user value(?,?,?,?,?,?,?,?,now(),?,?,?,?,?,?)';
+              let params = [tool.uuid(),user.number,user.name,'flaginfo123',user.mobile,user.tel,user.email,user.date,null,null,user.role,user.gender,user.position,user.desc];
+              console.log(params);
+              connect.query(sql,params,function(err,result){
+                  console.log(err);
+                  if(err){
+                      console.log(err)
+                      res.end(JSON.stringify({
+                          resultCode : '-1',
+                          message:'add failed'
+                      }));
+                  }else{
+                      res.end(JSON.stringify({
+                          resultCode : '200',
+                          body:{}
+                      }));
+                  }
 
+              });
+          }
       });
+
   },
   updateUser:function(req,res,next){
     let user = req.query.user;

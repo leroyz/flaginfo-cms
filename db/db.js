@@ -3,7 +3,8 @@ var connection = mysql.createConnection({
     host:'127.0.0.1',
     user:'root',
     password:'password',
-    database:'flaginfo_web'
+    database:'flaginfo-web',
+    timezone:'08:00'
 })
 connection.once('open' ,function() {
     console.log('连接数据成功')

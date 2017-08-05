@@ -27,7 +27,7 @@ router.post('/api/leave/statistic',Leave.getLeaveStatistic);//我的调休统计
 
 
 /*加班管理*/
-router.post('/api/overTime/addBill', Overtime.addOverTimeBill);
+router.post('/api/overTime/add', Overtime.addOverTimeBill);
 router.post('/api/overTime/myList', Overtime.getMyOverTimeList);//我的加班记录
 router.post('/api/overTime/statistic', Overtime.getOverTimeStatistic);//加班统计
 
