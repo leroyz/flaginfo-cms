@@ -68,12 +68,18 @@ module.exports = {
     getLeaveStatistic:function(req,res,next){
         let option = req.body;
         console.log(option);
-        let sql = 'select user.number,user.name,sum(leave_bill.time) as time from user LEFT JOIN leave_bill on user.id = leave_bill.user_id where user.role != 0';
+        let sql = 'SELECT o.id,o.number,o.name,sum(leave_bill.time) AS leavetime,o.overtime '+
+                    'FROM(select user.id,user.number,user.name,user.role,'+
+                    'sum(overtime_bill.time) AS overtime '+
+                    'from user LEFT JOIN overtime_bill ON user.id = overtime_bill.user_id '+
+                    'WHERE user.role != 0 ) AS o '+
+                    'LEFT JOIN leave_bill ON o.id = leave_bill.user_id '+
+                    'WHERE o.role != 0';
         if(!tool.isEmpty(option.username)){
-            sql += ' and user.name like "%'+option.username+'%"';
+            sql += ' and o.name like "%'+option.username+'%"';
         }
         if(!tool.isEmpty(option.number)){
-            sql += ' and user.number ='+option.number;
+            sql += ' and o.number ='+option.number;
         }
         if(!tool.isEmpty(option.beginTime)){
             sql += ' and leave_bill.begin_date > "'+option.beginTime+'"';
@@ -81,7 +87,7 @@ module.exports = {
         if(!tool.isEmpty(option.endTime)){
             sql += ' and leave_bill.end_date < "'+option.endTime+'"';
         }
-        sql += ' group by user.name';
+        // sql += ' group by user.name';
         console.log('==============='+sql);
         connect.query(sql,function(err,result){
             if(err){
@@ -91,6 +97,7 @@ module.exports = {
                     message:'query failed'
                 }));
             }else{
+                console.log(result);
                 res.end(JSON.stringify({
                     resultCode:'200',
                     body:result
