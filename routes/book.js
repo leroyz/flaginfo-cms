@@ -5,15 +5,16 @@ var tool = require('../tool/tool.js');
 
 module.exports = {
     getBookList:function(req,res,next){
-        var option = req.body;
-        let sql = 'select book.number,book.name,book.status,user.name username from book left join user on book.user_id=user.id where 1=1';
+        let option = req.body;
+        let resultData={};
+        let sql = 'select book.id,book.number,book.name,book.status,user.name username from book left join user on book.user_id=user.id where 1=1';
         if(option.number){
-            sql += ' and number="'+option.number+'"';
+            sql += ' and book.number="'+option.number+'"';
         }
         if(option.name){
-            sql += ' and name="'+option.name+'"';
+            sql += ' and book.name like "%'+option.name+'%"';
         }
-        sql += ' limit '+(option.pageNo-1)*option.pageSize+','+option.pageNo*option.pageSize;
+        console.log(sql)
         connect.query(sql,function(err,result){
             if(err){
                 res.end(JSON.stringify({
@@ -21,47 +22,63 @@ module.exports = {
                     message:'query failed'
                 }));
             }else{
-                res.end(JSON.stringify({
-                    resultCode : '200',
-                    body:result
-                }));
+                resultData['total'] = result.length;
+                sql += ' limit '+(option.pageNo-1)*option.pageSize+','+option.pageNo*option.pageSize;
+                connect.query(sql,function(err,result){
+                    if(err){
+                        res.end(JSON.stringify({
+                            resultCode:'-1',
+                            message:'query failed'
+                        }));
+                    }else{
+                        resultData['list'] = result;
+                        res.end(JSON.stringify({
+                            resultCode:'200',
+                            body:resultData
+                        }));
+                    }
+                });
             }
         });
     },
     addBook:function(req,res,next){
         var book = req.body;
         connect.query('select id from book where number="'+book.number+'"',function(err,result){
-            if(result){
+            if(result.length > 0){
                 res.end(JSON.stringify({
                     resultCode : '-1',
                     message:'该编号已经存在'
                 }));
                 return;
-            }
-        });
-        let sql = 'inset into book values(?,?,?,?)';
-        var params = [tool.uuid(),book.name,book.number,new Date()];
-        connect.query(sql,params,function(err,result){
-            if(err){
-                res.end(JSON.stringify({
-                    resultCode : '-1',
-                    message:'add failed'
-                }));
             }else{
-                res.end(JSON.stringify({
-                    resultCode : '200',
-                    body:{}
-                }));
+                let sql = 'insert into book values(?,?,?,null,now(),?,null,null,null)';
+                var params = [tool.uuid(),book.name,book.number,0];
+                console.log(params);
+                connect.query(sql,params,function(err,result){
+                    if(err){
+                        console.log(err);
+                        res.end(JSON.stringify({
+                            resultCode : '-1',
+                            message:'add failed'
+                        }));
+                    }else{
+                        res.end(JSON.stringify({
+                            resultCode : '200',
+                            body:{}
+                        }));
+                    }
+                });
             }
         });
+
     },
     deleteBook:function(req,res,next){
-        let sql = 'delete from book where id="'+req.body.id;
+        let sql = 'delete from book where id="'+req.body.id+'"';
         connect.query(sql,function(err,result){
             if(err){
                 res.end(JSON.stringify({
                     resultCode : '-1',
-                    message:'add failed'
+                    message:'delete failed'
                 }));
             }else{
                 res.end(JSON.stringify({
@@ -90,7 +107,61 @@ module.exports = {
     },
     borrowBook:function(req,res,next){
         var borrow = req.body;
-        let sql='update book set status=1,begin_date='+borrow.begin_date+',end_date='+borrow.end_date+',user_id='+borrow.user_id+' where number="'+borrow.number+'"';
+        let sql='update book set status=1,begin_date=now(),end_date="'+borrow.endDate+'",user_id="'+borrow.userId+'" where id="'+borrow.bookId+'"';
+        console.log(sql);
+        connect.query(sql,function(err,result){
+            if(err){
+                console.log(err);
+                res.end(JSON.stringify({
+                    resultCode : '-1',
+                    message:'update failed'
+                }));
+            }else{
+                res.end(JSON.stringify({
+                    resultCode : '200',
+                    body:{}
+                }));
+            }
+        });
+    },
+    //我的借阅
+    myBorrow:function(req,res,next){
+        var option = req.body;
+        var resultData = {};
+        let sql='select * from book where user_id="'+option.userId+'"';
+        console.log(sql);
+        connect.query(sql,function(err,result){
+            if(err){
+                console.log(err);
+                res.end(JSON.stringify({
+                    resultCode : '-1',
+                    message:'update failed'
+                }));
+            }else{
+                resultData['total'] = result.length;
+                sql += ' limit '+(option.pageNo-1)*option.pageSize+','+option.pageNo*option.pageSize;
+                connect.query(sql,function(err,result){
+                    if(err){
+                        console.log(err);
+                        res.end(JSON.stringify({
+                            resultCode : '-1',
+                            message:'update failed'
+                        }));
+                    }else{
+                        resultData['list'] = result;
+                        res.end(JSON.stringify({
+                            resultCode : '200',
+                            body:resultData
+                        }));
+                    }
+                });
+            }
+        });
+    },
+    returnBook:function(req,res,next){
+        var option = req.body;
+        let sql='update book set status=0,begin_date=null,end_date=null,return_date=now(),user_id="" where id="'+option.id+'"';
+        console.log(sql);
         connect.query(sql,function(err,result){
             if(err){
                 res.end(JSON.stringify({
@@ -105,10 +176,8 @@ module.exports = {
             }
         });
     },
-    returnBook:function(req,res,next){
-        var borrow = req.body;
-        let sql='update book set status=0,begin_date=null,end_date=null,user_id="" where id="'+borrow+'"';
-        connect.query(sql,function(err,result){
+    getAllBook:function(req,res,next){
+        connect.query('select * from book where status=0',function(err,result){
             if(err){
                 res.end(JSON.stringify({
                     resultCode : '-1',
@@ -117,7 +186,22 @@ module.exports = {
             }else{
                 res.end(JSON.stringify({
                     resultCode : '200',
-                    body:{}
+                    body:result
+                }));
+            }
+        });
+    },
+    getAllStaff:function(req,res,next){
+        connect.query('select * from user where role !=0',function(err,result){
+            if(err){
+                res.end(JSON.stringify({
+                    resultCode : '-1',
+                    message:'get failed'
+                }));
+            }else{
+                res.end(JSON.stringify({
+                    resultCode : '200',
+                    body:result
                 }));
             }
         });

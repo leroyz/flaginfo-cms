@@ -34,12 +34,15 @@ router.post('/api/overTime/statistic', Overtime.getOverTimeStatistic);//加班�
 
 
 /*书籍管理*/
-router.post('/api/book/get', Book.getBookList);
+router.post('/api/book/query', Book.getBookList);
 router.post('/api/book/add',Book.addBook);
 router.post('/api/book/delete',Book.deleteBook);
 router.post('/api/book/update',Book.updateBook);
 router.post('/api/book/borrow',Book.borrowBook);
+router.post('/api/book/myBorrow',Book.myBorrow);
 router.post('/api/book/return',Book.returnBook);
+router.post('/api/book/allBook',Book.getAllBook);
+router.post('/api/book/allStaff',Book.getAllStaff);
 
 
 
