@@ -22,14 +22,13 @@ DROP TABLE IF EXISTS `book`;
 CREATE TABLE `book` (
   `id` varchar(255) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `number` varchar(10) NOT NULL,
+  `number` varchar(10) NOT NULL UNIQUE,
   `create_date` date NOT NULL,
   `status` int(1) unsigned zerofill NOT NULL DEFAULT '0' COMMENT '状态，0表示未借出，1表示已借出',
   `user_id` varchar(255) DEFAULT NULL COMMENT '借书人id',
   `begin_date` date DEFAULT NULL COMMENT '开始时间',
   `end_date` date DEFAULT NULL COMMENT '结束时间',
   `return_date` date DEFAULT NULL COMMENT '归还时间',
-  UNIQUE ('number'),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -153,7 +152,7 @@ CREATE TABLE `project` (
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` varchar(255) NOT NULL,
-  `number` varchar(255) NOT NULL,
+  `number` varchar(255) NOT NULL UNIQUE,
   `name` varchar(30) NOT NULL COMMENT '名字',
   `password` varchar(16) NOT NULL,
   `mobile` varchar(11) NOT NULL COMMENT '移动电话',
@@ -167,7 +166,6 @@ CREATE TABLE `user` (
   `gender` int(1) NOT NULL COMMENT '性别，0表示男，1表示女',
   `position` varchar(50) DEFAULT NULL COMMENT '职位',
   `desc` varchar(500) DEFAULT NULL COMMENT '备注，描述',
-  UNIQUE ('number'),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
